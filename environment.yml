@@ -1,0 +1,26 @@
+name: retinaguard
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pytorch
+  - torchvision
+  - cpuonly
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - pyyaml
+  - tqdm
+  - pip
+  - pip:
+      - timm
+      - albumentations
+      - opencv-python-headless
+      - grad-cam
+      - streamlit
+      - python-dotenv
+      - loguru
