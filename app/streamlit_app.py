@@ -134,41 +134,71 @@ def load_calibration_params(project_root: Path) -> tuple[float, float, float]:
         except Exception as e:
             logger.warning(f"Failed to load calibration summary: {e}")
     return 0.50, 0.45, 0.55
-
-
 def assess_image_suitability(image_rgb: np.ndarray) -> tuple[str, list[str]]:
     """Assess image quality and compatibility with IDRiD dataset.
 
     Checks:
     - Resolution and shape
+    - Colour channel ratios (detects non-retinal invalid inputs)
+    - Centring and field completeness (via mask center of mass)
     - Average brightness
     - Contrast (std of grayscale)
     - Blur/sharpness (Laplacian variance)
     """
     reasons = []
     
-    # Check shape
+    # 1. Check shape and resolution
     h, w, c = image_rgb.shape
     if h < 200 or w < 200:
         reasons.append("Resolution is too low for reliable classification.")
         return "Rejected", reasons
         
+    # 2. Colour channel ratio checking (retinal photographs are predominantly red/green)
+    r_mean = float(np.mean(image_rgb[:, :, 0]))
+    g_mean = float(np.mean(image_rgb[:, :, 1]))
+    b_mean = float(np.mean(image_rgb[:, :, 2]))
+    
+    r_b_ratio = r_mean / b_mean if b_mean > 0 else 0
+    g_b_ratio = g_mean / b_mean if b_mean > 0 else 0
+    
+    if r_b_ratio < 1.2 or g_b_ratio < 0.8:
+        reasons.append("Image does not match the expected colour signature of a retinal fundus photograph.")
+        return "Rejected", reasons
+
     # Convert to grayscale for metric calculations
     gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
     
-    # 1. Brightness check
+    # 3. Centring and field completeness check
+    _, thresh = cv2.threshold(gray, 15, 255, cv2.THRESH_BINARY)
+    M = cv2.moments(thresh)
+    if M["m00"] > 0:
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+        
+        # Relative distance of center of mass from geometric center of image
+        dist_x = abs(cX - w / 2) / w
+        dist_y = abs(cY - h / 2) / h
+        total_dist = np.sqrt(dist_x**2 + dist_y**2)
+        
+        if total_dist > 0.020:
+            reasons.append("Retinal field appears off-centre or incomplete.")
+    else:
+        reasons.append("Could not detect any circular retinal structure.")
+        return "Rejected", reasons
+
+    # 4. Brightness check
     mean_brightness = float(np.mean(gray))
     if mean_brightness < 40:
         reasons.append("Image is too dark (average brightness below threshold).")
     elif mean_brightness > 215:
         reasons.append("Image is overexposed (average brightness above threshold).")
         
-    # 2. Contrast check
+    # 5. Contrast check
     contrast = float(np.std(gray))
     if contrast < 20:
         reasons.append("Image has extremely low contrast (flat histogram).")
         
-    # 3. Sharpness check using Laplacian variance
+    # 6. Sharpness check using Laplacian variance
     sharpness = float(cv2.Laplacian(gray, cv2.CV_64F).var())
     if sharpness < 10.0:
         reasons.append("Image is excessively blurry or out of focus.")

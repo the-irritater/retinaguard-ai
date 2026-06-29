@@ -47,3 +47,6 @@ wandb/
 
 # Temporary uploads
 app/uploads/
+
+# Test image pack
+retinaguard_test_images/
