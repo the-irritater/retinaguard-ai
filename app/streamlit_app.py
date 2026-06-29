@@ -284,6 +284,15 @@ def main():
         show_education = st.checkbox("Show Patient Education", value=False)
         
         st.divider()
+        
+        # Local file path text input for testing/automation support
+        local_image_path = st.text_input(
+            "Local Image Path (for automation/testing)",
+            value="",
+            help="Direct path to an image file on the local filesystem. Used in automated tests.",
+        )
+        
+        st.divider()
         st.markdown(" [View Model Card](ppc/reports/model_card.md)")
         st.markdown(" [View Study Protocol](ppc/reports/study_protocol.md)")
     
@@ -299,15 +308,23 @@ def main():
         help="Upload a colour retinal fundus image for analysis.",
     )
     
-    if uploaded_file is not None:
-        # Read and decode the image
+    image_bgr = None
+    if local_image_path:
+        local_p = Path(local_image_path)
+        if local_p.exists() and local_p.is_file():
+            image_bgr = cv2.imread(str(local_p))
+            if image_bgr is None:
+                st.sidebar.error("Failed to read image from local path.")
+        else:
+            st.sidebar.warning("Local image path does not exist or is not a file.")
+    elif uploaded_file is not None:
         file_bytes = np.frombuffer(uploaded_file.read(), dtype=np.uint8)
         image_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        
         if image_bgr is None:
             st.error(" Could not read the uploaded image. Please try a different file.")
             return
-            
+
+    if image_bgr is not None:
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         
         # Display original image
