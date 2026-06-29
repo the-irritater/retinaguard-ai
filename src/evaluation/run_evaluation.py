@@ -41,6 +41,7 @@ from src.evaluation.metrics import (
     compute_roc_curve,
     compute_pr_curve,
     select_threshold,
+    select_uncertainty_bounds,
 )
 from src.evaluation.calibration import (
     TemperatureScaler,
@@ -282,6 +283,14 @@ def run_evaluation(
     )
     logger.info(f"Locked classification threshold: {locked_threshold:.4f}")
 
+    # Derive locked uncertainty range [L, U] around classification threshold
+    lower_bound, upper_bound = select_uncertainty_bounds(
+        y_true=val_labels,
+        y_prob=val_pos_probs,
+        threshold=locked_threshold,
+    )
+    logger.info(f"Locked uncertainty zone: [{lower_bound:.4f}, {upper_bound:.4f}]")
+
     # 4. Extract test predictions (ONE-TIME evaluation)
     logger.info("Running inference on official test set...")
     test_logits = []
@@ -361,6 +370,9 @@ def run_evaluation(
             "slope": cal_stats["slope"],
             "intercept": cal_stats["intercept"],
             "temperature": float(temp_scaler.temperature.item()),
+            "threshold": locked_threshold,
+            "lower_bound": lower_bound,
+            "upper_bound": upper_bound,
         }, f, indent=2)
 
     # 8. Systematic Error Analysis

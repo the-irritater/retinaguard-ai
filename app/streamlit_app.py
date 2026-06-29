@@ -21,6 +21,7 @@ import cv2
 import numpy as np
 import streamlit as st
 import torch
+import json
 import yaml
 
 # Configure page
@@ -37,31 +38,34 @@ logger = logging.getLogger("retinaguard.app")
 # Constants
 # -
 DISCLAIMER_BANNER = """
- **RESEARCH PROTOTYPE - NOT A DIAGNOSTIC TOOL**
-
-This system is an academic research demonstration. It is **NOT** a medical device,
-**NOT** clinically validated, and **NOT** approved by any regulatory authority
-(FDA, CE, TGA, or equivalent). It must **NOT** be used to make diagnostic or
-treatment decisions. All outputs require independent verification by a
-qualified ophthalmologist.
+> **RESEARCH PROTOTYPE – NOT FOR CLINICAL USE**
+>
+> This software has not been clinically validated, reviewed, cleared or approved by any regulatory authority. It must not be used for diagnosis, treatment decisions, patient management or emergency assessment. All outputs require interpretation by a qualified eye-care professional.
 """
 
 GRADCAM_DISCLAIMER = (
     "The highlighted regions influenced the model's prediction. "
-    "They are **not** confirmed lesion boundaries."
+    "They are not confirmed lesion boundaries."
 )
 
 PATIENT_EDUCATION = """
-###  About Diabetic Retinopathy
+### About Diabetic Retinopathy
 
 Diabetic retinopathy (DR) is a complication of diabetes that affects the blood
 vessels in the retina - the light-sensitive tissue at the back of the eye.
 
 **Key Facts:**
-- DR is the leading cause of preventable blindness in working-age adults.
-- Early stages often have **no symptoms** - regular screening is essential.
+- Diabetic retinopathy is a major cause of vision impairment and blindness among working-age adults. Early detection, follow-up and timely treatment can reduce the risk of vision loss.
+- Early stages often have no symptoms. The National Eye Institute states that early diabetic retinopathy may have no symptoms, diagnosis is based on professional eye examination and treatment can include injections, laser procedures or surgery.
 - Effective treatments exist, especially when DR is detected early.
 - Good blood sugar, blood pressure, and cholesterol control can slow progression.
+
+**What should you do?**
+- See an ophthalmologist for regular dilated eye exams.
+- Work with your diabetes-care team to establish appropriate individual goals for blood glucose, blood pressure and cholesterol management.
+- Do not rely on any AI system for medical decisions.
+
+The following severity grades are provided for general education. This application does not determine or confirm an individual clinical DR grade. The present model is binary and does not assess all causes of referral, including diabetic macular oedema and other retinal conditions.
 
 **DR Severity Grades:**
 | Grade | Description | Typical Features |
@@ -71,11 +75,6 @@ vessels in the retina - the light-sensitive tissue at the back of the eye.
 | 2 | Moderate NPDR | More microaneurysms, dot/blot haemorrhages, hard exudates |
 | 3 | Severe NPDR | Extensive haemorrhages, venous beading, IRMA |
 | 4 | Proliferative DR | Neovascularisation, vitreous haemorrhage |
-
-**What should you do?**
--  See an ophthalmologist for regular dilated eye exams.
--  Maintain good glycaemic control (HbA1c < 7% as advised by your doctor).
--  Do not rely on any AI system for medical decisions.
 
 > **Important:** This educational information is general in nature. Consult your
 > healthcare provider for advice specific to your situation.
@@ -113,6 +112,71 @@ def load_model(config_path: str, checkpoint_path: str):
     model = model.to(device)
     model.eval()
     return model, config, device
+
+
+def load_calibration_params(project_root: Path) -> tuple[float, float, float]:
+    """Load locked threshold, lower_bound, and upper_bound from calibration_summary.json.
+
+    Fallback to threshold=0.50, lower=0.45, upper=0.55 if not found.
+    """
+    cal_path = project_root / "ppc" / "reports" / "tables" / "calibration_summary.json"
+    if not cal_path.exists():
+        cal_path = project_root / "reports" / "tables" / "calibration_summary.json"
+        
+    if cal_path.exists():
+        try:
+            with open(cal_path) as f:
+                data = json.load(f)
+            threshold = data.get("threshold", 0.50)
+            lower_bound = data.get("lower_bound", threshold - 0.05)
+            upper_bound = data.get("upper_bound", threshold + 0.05)
+            return threshold, lower_bound, upper_bound
+        except Exception as e:
+            logger.warning(f"Failed to load calibration summary: {e}")
+    return 0.50, 0.45, 0.55
+
+
+def assess_image_suitability(image_rgb: np.ndarray) -> tuple[str, list[str]]:
+    """Assess image quality and compatibility with IDRiD dataset.
+
+    Checks:
+    - Resolution and shape
+    - Average brightness
+    - Contrast (std of grayscale)
+    - Blur/sharpness (Laplacian variance)
+    """
+    reasons = []
+    
+    # Check shape
+    h, w, c = image_rgb.shape
+    if h < 200 or w < 200:
+        reasons.append("Resolution is too low for reliable classification.")
+        return "Rejected", reasons
+        
+    # Convert to grayscale for metric calculations
+    gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
+    
+    # 1. Brightness check
+    mean_brightness = float(np.mean(gray))
+    if mean_brightness < 40:
+        reasons.append("Image is too dark (average brightness below threshold).")
+    elif mean_brightness > 215:
+        reasons.append("Image is overexposed (average brightness above threshold).")
+        
+    # 2. Contrast check
+    contrast = float(np.std(gray))
+    if contrast < 20:
+        reasons.append("Image has extremely low contrast (flat histogram).")
+        
+    # 3. Sharpness check using Laplacian variance
+    sharpness = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    if sharpness < 10.0:
+        reasons.append("Image is excessively blurry or out of focus.")
+        
+    if len(reasons) > 0:
+        return "Uncertain", reasons
+    else:
+        return "Acceptable", []
 
 
 def preprocess_for_inference(image_rgb: np.ndarray, config: dict) -> torch.Tensor:
@@ -167,6 +231,9 @@ def main():
             value=str(project_root / "models" / "checkpoints" / "final" / "best_model_fold0_binary.pt"),
         )
         
+        # Load validation parameters
+        locked_threshold, lower_bound, upper_bound = load_calibration_params(project_root)
+        
         st.divider()
         
         # Threshold
@@ -174,18 +241,21 @@ def main():
             "Classification Threshold",
             min_value=0.0,
             max_value=1.0,
-            value=0.50,
+            value=locked_threshold,
             step=0.01,
-            help="Probability threshold for DR grade ≥ 2 classification. "
+            help="Probability threshold for DR grade >= 2 classification. "
                  "Selected on validation data using Youden's J statistic.",
         )
+        
+        st.caption(f"Locked threshold: **{locked_threshold:.4f}**")
+        st.caption(f"Locked uncertainty zone: **[{lower_bound:.4f}, {upper_bound:.4f}]**")
         
         show_gradcam = st.checkbox("Show Grad-CAM Overlay", value=True)
         show_education = st.checkbox("Show Patient Education", value=False)
         
         st.divider()
-        st.markdown(" [View Model Card](reports/model_card.md)")
-        st.markdown(" [View Study Protocol](reports/study_protocol.md)")
+        st.markdown(" [View Model Card](ppc/reports/model_card.md)")
+        st.markdown(" [View Study Protocol](ppc/reports/study_protocol.md)")
     
     # --- Main Content ---
     st.markdown(DISCLAIMER_BANNER)
@@ -241,36 +311,114 @@ def main():
                 prob_positive = probs[0, 1].item()
                 prob_negative = probs[0, 0].item()
         
-        # Classification result
-        prediction = "DR Grade ≥ 2 (Potentially Referable)" if prob_positive >= threshold else "DR Grade < 2 (Non-Referable)"
-        confidence = max(prob_positive, prob_negative)
+        # Assess image suitability
+        suitability, suitability_reasons = assess_image_suitability(image_rgb)
+        
+        # Calculate uncertainty boundaries around selected threshold
+        # We shift them proportionally to the user's selected threshold if they adjusted it,
+        # but preserve the size of the uncertainty zone.
+        zone_half_width = (upper_bound - lower_bound) / 2.0
+        current_lower = max(0.01, threshold - zone_half_width)
+        current_upper = min(0.99, threshold + zone_half_width)
+        
+        # Classification using uncertainty zone
+        if current_lower <= prob_positive <= current_upper:
+            classification = "Indeterminate"
+            uncertainty_level = "High"
+            interpretation = (
+                "The model score is extremely close to the decision threshold. The system "
+                "cannot provide a reliable positive or negative classification for this "
+                "image."
+            )
+            if prob_positive >= threshold:
+                model_output_desc = "Score slightly above the study threshold for DR grade >= 2"
+            else:
+                model_output_desc = "Score slightly below the study threshold for DR grade >= 2"
+        elif prob_positive < current_lower:
+            classification = "Below study threshold"
+            uncertainty_level = "Low"
+            interpretation = (
+                "Model score is below the locked study threshold. This suggests a lower "
+                "likelihood of potentially referable diabetic retinopathy (DR grade >= 2)."
+            )
+            model_output_desc = "Score below the study threshold for DR grade >= 2"
+        else:
+            classification = "Above study threshold"
+            uncertainty_level = "Low"
+            interpretation = (
+                "Model score is above the locked study threshold. This suggests a higher "
+                "likelihood of potentially referable diabetic retinopathy (DR grade >= 2)."
+            )
+            model_output_desc = "Score above the study threshold for DR grade >= 2"
+
+        decision_margin = prob_positive - threshold
+        margin_sign = "+" if decision_margin >= 0 else ""
         
         with col2:
-            # Result card
-            if prob_positive >= threshold:
-                st.error(f" **{prediction}**")
+            st.markdown("### Analysis Result")
+            
+            # Suitability Display
+            st.markdown("**Image suitability:**")
+            if suitability == "Acceptable":
+                st.success("Accepted for experimental analysis")
+            elif suitability == "Uncertain":
+                st.warning("Uncertain suitability")
+                for reason in suitability_reasons:
+                    st.caption(f"- {reason}")
             else:
-                st.success(f" **{prediction}**")
+                st.error("Rejected suitability")
+                for reason in suitability_reasons:
+                    st.caption(f"- {reason}")
+            st.caption("*Quality and dataset compatibility remain uncertain.*")
+            st.caption(
+                "Image quality and compatibility checking are experimental. A "
+                "successfully uploaded image is not necessarily suitable for reliable analysis."
+            )
             
-            st.metric("Probability (DR ≥ 2)", f"{prob_positive:.4f}")
-            st.metric("Model Confidence", f"{confidence:.2%}")
-            st.metric("Threshold Used", f"{threshold:.4f}")
+            st.divider()
             
-            # Uncertainty indicator
-            if confidence < 0.6:
-                st.warning(" **Low confidence prediction** - model is uncertain about this image.")
-            elif confidence < 0.8:
-                st.info(" Moderate confidence - consider additional review.")
-        
-        # Professional recommendation
-        st.divider()
-        st.markdown("###  Professional Assessment Recommendation")
-        st.info(
-            "**This result requires verification by a qualified ophthalmologist.** "
-            "This system is a research prototype and cannot replace professional "
-            "clinical assessment. Please consult an eye care professional for "
-            "diagnosis and treatment planning."
-        )
+            # Screening classification
+            st.markdown("**Screening classification:**")
+            if classification == "Indeterminate":
+                st.info(f"**{classification}**")
+            elif classification == "Above study threshold":
+                st.error(f"**{classification}**")
+            else:
+                st.success(f"**{classification}**")
+                
+            # Decision Metrics
+            st.metric("Calibrated model score", f"{prob_positive:.4f}")
+            st.caption(
+                "The model score estimates the study-defined outcome under the development "
+                "dataset. It is not an individual clinical probability or diagnosis."
+            )
+            
+            st.metric("Locked study threshold", f"{threshold:.4f}")
+            st.metric("Decision margin", f"{margin_sign}{decision_margin:.4f}")
+            st.metric("Uncertainty", uncertainty_level)
+            
+            st.divider()
+            
+            # Interpretation & Actions
+            st.markdown("**Model output:**")
+            st.caption(model_output_desc)
+            
+            st.markdown("**Interpretation:**")
+            st.write(interpretation)
+            
+            st.markdown("**Recommended action:**")
+            st.info(
+                "Do not interpret this output as a diagnosis. A qualified ophthalmologist "
+                "should assess the retinal image and determine whether diabetic "
+                "retinopathy or another eye condition is present."
+            )
+            
+            st.markdown("**Model limitation:**")
+            st.caption(
+                "This image may differ from the photographs used to develop the model. "
+                "Differences in camera type, illumination, colour, resolution and image "
+                "processing can affect model output."
+            )
         
         # Grad-CAM
         if show_gradcam:

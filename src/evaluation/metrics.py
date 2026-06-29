@@ -110,6 +110,59 @@ def select_threshold_sensitivity_target(
     return best_threshold
 
 
+def select_uncertainty_bounds(
+    y_true: np.ndarray,
+    y_prob: np.ndarray,
+    threshold: float,
+    target_sensitivity: float = 0.95,
+    target_specificity: float = 0.95,
+) -> tuple[float, float]:
+    """Derive uncertainty boundaries (L, U) around the threshold from validation data.
+
+    Lower bound L: maximum threshold where validation sensitivity >= target_sensitivity.
+    Upper bound U: minimum threshold where validation specificity >= target_specificity.
+    
+    If validation scores fall in [L, U], the prediction is classified as Indeterminate.
+    """
+    fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+    
+    # Lower bound: we want sensitivity >= target_sensitivity
+    idx_sens = np.where(tpr >= target_sensitivity)[0]
+    if len(idx_sens) > 0:
+        candidate_thresholds = thresholds[idx_sens]
+        valid_candidates = candidate_thresholds[candidate_thresholds <= threshold]
+        if len(valid_candidates) > 0:
+            lower_bound = float(np.max(valid_candidates))
+        else:
+            lower_bound = float(np.min(candidate_thresholds))
+    else:
+        lower_bound = threshold - 0.05
+        
+    # Upper bound: we want specificity >= target_specificity
+    idx_spec = np.where((1 - fpr) >= target_specificity)[0]
+    if len(idx_spec) > 0:
+        candidate_thresholds = thresholds[idx_spec]
+        valid_candidates = candidate_thresholds[candidate_thresholds >= threshold]
+        if len(valid_candidates) > 0:
+            upper_bound = float(np.min(valid_candidates))
+        else:
+            upper_bound = float(np.max(candidate_thresholds))
+    else:
+        upper_bound = threshold + 0.05
+        
+    # Safety constraints to prevent bounds collapse
+    lower_bound = max(0.01, min(lower_bound, threshold - 0.01))
+    upper_bound = min(0.99, max(upper_bound, threshold + 0.01))
+    
+    # Make sure bounds cover the threshold properly
+    if not (lower_bound < threshold < upper_bound):
+        lower_bound = max(0.01, threshold - 0.05)
+        upper_bound = min(0.99, threshold + 0.05)
+        
+    logger.info(f"Derived validation uncertainty zone: [{lower_bound:.4f}, {upper_bound:.4f}] around threshold {threshold:.4f}")
+    return lower_bound, upper_bound
+
+
 def select_threshold(
     y_true: np.ndarray,
     y_prob: np.ndarray,

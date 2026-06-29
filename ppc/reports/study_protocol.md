@@ -4,10 +4,11 @@
 **Date:** 2026-06-29  
 **Status:** Pre-registration draft  
 
-> **Disclaimer:** This document describes an academic research prototype.
-> The system described herein is NOT a medical device, has NOT received
-> regulatory approval from any authority, and MUST NOT be used for clinical
-> diagnosis, treatment decisions, or patient management.
+> **Disclaimer:** RESEARCH PROTOTYPE - NOT FOR CLINICAL USE. This software has not
+> been clinically validated, reviewed, cleared or approved by any regulatory
+> authority. It must not be used for diagnosis, treatment decisions, patient
+> management or emergency assessment. All outputs require interpretation by a
+> qualified eye-care professional.
 
 ---
 

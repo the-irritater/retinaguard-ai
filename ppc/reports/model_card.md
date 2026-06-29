@@ -2,13 +2,13 @@
 
 > **Version:** 1.0.0  
 > **Last Updated:** 2026-06-29  
-> **Status:** Research Prototype - NOT a diagnostic tool
+> **Status:** RESEARCH PROTOTYPE - NOT FOR CLINICAL USE
 
 ---
 
-##  Intended Use Disclaimer
+## Intended Use Disclaimer
 
-**This system is an academic research prototype. It is NOT a medical device, NOT clinically validated, and NOT approved by any regulatory body (FDA, CE, TGA, or equivalent). It must NOT be used to make diagnostic or treatment decisions. All outputs require independent verification by a qualified ophthalmologist.**
+**RESEARCH PROTOTYPE - NOT FOR CLINICAL USE. This software has not been clinically validated, reviewed, cleared or approved by any regulatory authority. It must not be used for diagnosis, treatment decisions, patient management or emergency assessment. All outputs require interpretation by a qualified eye-care professional.**
 
 ---
 
