@@ -400,7 +400,7 @@ def run_evaluation(
             idx = int(np.where(err_df["image_id"] == img_id)[0][0])
             sample = test_dataset[idx]
             
-            overlay, heatmap = explainer.generate(
+            overlay, heatmap, _is_meaningful = explainer.generate(
                 sample["image"],
                 target_category=1 if task == "binary" else sample["label"]
             )

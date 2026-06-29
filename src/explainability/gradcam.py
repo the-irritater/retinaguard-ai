@@ -84,7 +84,7 @@ class GradCAMExplainer:
         self,
         image_tensor: torch.Tensor,
         target_category: int = 1,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, bool]:
         """Generate Grad-CAM heatmap and overlay on the original image.
 
         Args:
@@ -95,6 +95,8 @@ class GradCAMExplainer:
             Tuple of:
             - overlay: RGB image with CAM overlay (shape: [H, W, 3]).
             - grayscale_cam: Grayscale heatmap (shape: [H, W]).
+            - is_meaningful: True if the heatmap contains meaningful spatial
+              variation, False if it is near-uniform (e.g. untrained model).
         """
         self.model.eval()
         
@@ -123,12 +125,46 @@ class GradCAMExplainer:
                 target_layers=[self.target_layer],
             ) as cam:
                 grayscale_cam = cam(input_tensor=input_tensor, targets=targets)[0, :]
-                overlay = show_cam_on_image(img_np, grayscale_cam, use_rgb=True)
+
+            # Check whether the heatmap has meaningful spatial variation.
+            # With untrained / random weights the CAM is often all zeros
+            # or near-uniform, which renders as a blank black image.
+            is_meaningful = self._heatmap_is_meaningful(grayscale_cam)
+
+            if not is_meaningful:
+                logger.warning(
+                    "Grad-CAM heatmap has no meaningful spatial variation. "
+                    "The model may not be trained."
+                )
+
+            overlay = show_cam_on_image(img_np, grayscale_cam, use_rgb=True)
                 
-            return overlay, grayscale_cam
+            return overlay, grayscale_cam, is_meaningful
         else:
             # Fallback: simple native implementation of Grad-CAM
-            return self._fallback_gradcam(input_tensor, img_np, target_category)
+            overlay, grayscale_cam = self._fallback_gradcam(
+                input_tensor, img_np, target_category
+            )
+            is_meaningful = self._heatmap_is_meaningful(grayscale_cam)
+            return overlay, grayscale_cam, is_meaningful
+
+    @staticmethod
+    def _heatmap_is_meaningful(
+        cam: np.ndarray,
+        min_range: float = 0.05,
+        min_std: float = 0.01,
+    ) -> bool:
+        """Return True if the heatmap has meaningful spatial variation.
+
+        A heatmap is considered empty / non-informative when its dynamic range
+        (max - min) is below *min_range* **and** its standard deviation is
+        below *min_std*.  Both thresholds must be violated for the heatmap to
+        be flagged as non-meaningful, avoiding false positives on naturally
+        low-contrast but valid heatmaps.
+        """
+        value_range = float(cam.max() - cam.min())
+        value_std = float(cam.std())
+        return value_range >= min_range or value_std >= min_std
 
     def _fallback_gradcam(
         self,

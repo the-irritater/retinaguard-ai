@@ -138,8 +138,8 @@ def generate_gradcam(model, image_tensor, device):
     from src.explainability.gradcam import GradCAMExplainer
     
     explainer = GradCAMExplainer(model, use_cuda=torch.cuda.is_available())
-    overlay, heatmap = explainer.generate(image_tensor.to(device), target_category=1)
-    return overlay, heatmap
+    overlay, heatmap, is_meaningful = explainer.generate(image_tensor.to(device), target_category=1)
+    return overlay, heatmap, is_meaningful
 
 
 # -
@@ -275,12 +275,19 @@ def main():
         # Grad-CAM
         if show_gradcam:
             st.divider()
-            st.markdown("###  Grad-CAM Visual Explanation")
-            st.warning(f" {GRADCAM_DISCLAIMER}")
+            st.markdown("### Grad-CAM Visual Explanation")
+            st.warning(f"{GRADCAM_DISCLAIMER}")
             
             with st.spinner("Generating Grad-CAM overlay..."):
                 try:
-                    overlay, heatmap = generate_gradcam(model, image_tensor, device)
+                    overlay, heatmap, is_meaningful = generate_gradcam(model, image_tensor, device)
+                    
+                    if not is_meaningful:
+                        st.info(
+                            "The Grad-CAM heatmap has no meaningful spatial variation. "
+                            "This typically means the model has not been trained. "
+                            "Load a trained checkpoint to see informative heatmaps."
+                        )
                     
                     gcol1, gcol2, gcol3 = st.columns(3)
                     
@@ -291,10 +298,17 @@ def main():
                     img_display = std * img_np + mean
                     img_display = np.clip(img_display, 0.0, 1.0)
                     
+                    # Apply JET colormap to grayscale heatmap for proper
+                    # visualisation.  The raw heatmap is a float32 array in
+                    # [0, 1]; without a colormap Streamlit renders it as a
+                    # near-black greyscale image.
+                    import matplotlib.cm as cm
+                    heatmap_colored = cm.jet(heatmap)[:, :, :3]  # drop alpha
+                    
                     with gcol1:
                         st.image(img_display, caption="Preprocessed Image", use_container_width=True)
                     with gcol2:
-                        st.image(heatmap, caption="Grad-CAM Heatmap", use_container_width=True, clamp=True)
+                        st.image(heatmap_colored, caption="Grad-CAM Heatmap", use_container_width=True, clamp=True)
                     with gcol3:
                         st.image(overlay, caption="Grad-CAM Overlay", use_container_width=True)
                         
