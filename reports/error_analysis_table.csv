@@ -1,0 +1,11 @@
+image_id,dr_grade,dme_grade,mean_brightness,sharpness,full_path,true_label,predicted_probability,uncalibrated_probability,predicted_label,error_category,is_error,model_confidence,high_confidence_mistake,low_confidence_correct,mean_brightness_quartile,sharpness_quartile
+IDRiD_041,0,1,120.0,50.0,data/raw/images/IDRiD_041.jpg,0,0.50457555,0.5068772,0,TN,0,0.009151101,0,1,Q1 (Low),Q1 (Low)
+IDRiD_042,1,2,120.0,50.0,data/raw/images/IDRiD_042.jpg,0,0.50457555,0.5068772,0,TN,0,0.009151101,0,1,Q1 (Low),Q1 (Low)
+IDRiD_043,2,0,120.0,50.0,data/raw/images/IDRiD_043.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
+IDRiD_044,3,1,120.0,50.0,data/raw/images/IDRiD_044.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
+IDRiD_045,4,2,120.0,50.0,data/raw/images/IDRiD_045.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
+IDRiD_046,0,0,120.0,50.0,data/raw/images/IDRiD_046.jpg,0,0.50457555,0.5068772,0,TN,0,0.009151101,0,1,Q1 (Low),Q1 (Low)
+IDRiD_047,1,1,120.0,50.0,data/raw/images/IDRiD_047.jpg,0,0.50457555,0.5068772,0,TN,0,0.009151101,0,1,Q1 (Low),Q1 (Low)
+IDRiD_048,2,2,120.0,50.0,data/raw/images/IDRiD_048.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
+IDRiD_049,3,0,120.0,50.0,data/raw/images/IDRiD_049.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
+IDRiD_050,4,1,120.0,50.0,data/raw/images/IDRiD_050.jpg,1,0.50457555,0.5068772,0,FN,1,0.009151101,0,0,Q1 (Low),Q1 (Low)
