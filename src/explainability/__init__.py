@@ -1,1 +1,1 @@
-"""RetinaGuard AI — Explainability Package."""
+"""RetinaGuard AI - Explainability Package."""

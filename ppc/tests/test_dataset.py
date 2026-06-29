@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — PyTorch Dataset Unit Tests
-===========================================
+RetinaGuard AI - PyTorch Dataset Unit Tests
+-
 Purpose: Verify that IDRiDDataset loads data, handles CV folds, and returns
 properly shaped images and labels.
 """

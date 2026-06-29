@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Data Splitting
-================================
+RetinaGuard AI - Data Splitting
+-
 Purpose: Create stratified cross-validation folds from the official IDRiD
 training partition while preserving the official test set.
 
@@ -194,7 +194,7 @@ def verify_split_integrity(
             logger.warning(issue)
 
     if not issues:
-        logger.info("All integrity checks passed ✓")
+        logger.info("All integrity checks passed ")
 
     return issues
 
@@ -286,7 +286,7 @@ def run_splitting(config_path: Path) -> pd.DataFrame:
     n_folds = split_config["n_folds"]
 
     logger.info("=" * 60)
-    logger.info("RetinaGuard AI — Data Splitting")
+    logger.info("RetinaGuard AI - Data Splitting")
     logger.info(f"  Folds: {n_folds}")
     logger.info(f"  Seed: {seed}")
     logger.info(f"  Stratify by: {split_config['stratify_by']}")
@@ -332,7 +332,7 @@ def main() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
     parser = argparse.ArgumentParser(
-        description="RetinaGuard AI — Data Splitting"
+        description="RetinaGuard AI - Data Splitting"
     )
     parser.add_argument(
         "--config",

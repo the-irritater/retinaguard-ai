@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Bootstrap Evaluation
-=======================================
+RetinaGuard AI - Bootstrap Evaluation
+-
 Purpose: Calculate 95% confidence intervals for binary classification metrics
 using stratified bootstrap resampling (2,000 resamples).
 

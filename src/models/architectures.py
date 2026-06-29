@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Model Architectures
-======================================
+RetinaGuard AI - Model Architectures
+-
 Purpose: Configurable CNN architectures for DR classification with
 transfer learning and two-stage training support.
 

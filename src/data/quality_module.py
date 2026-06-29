@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Synthetic Image-Degradation Module
-======================================================
+RetinaGuard AI - Synthetic Image-Degradation Module
+-
 Purpose: Assess and simulate quality degradations in fundus images.
 
 WARNING: This module is purely experimental. IDRiD contains only expert-selected
@@ -106,9 +106,9 @@ class ImageDegradationSimulator:
         return padded
 
 
-# ---------------------------------------------------------------------------
+# -
 # Simple Heuristic Degradation Detector (Experimental)
-# ---------------------------------------------------------------------------
+# -
 def detect_synthetic_degradations(
     image: np.ndarray,
     min_sharpness: float = 15.0,

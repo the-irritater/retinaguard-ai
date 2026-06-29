@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Data Splitting Unit Tests
-============================================
+RetinaGuard AI - Data Splitting Unit Tests
+-
 Purpose: Verify that the data splitting logic is correct:
 - Official test partition is untouched.
 - Training set is split into stratified k-folds.

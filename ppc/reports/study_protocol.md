@@ -156,7 +156,7 @@ DOI: 10.21227/H25W98
 ### 13.2 Composition
 
 | Partition | Images | Purpose |
-|-----------|--------|---------|
+|-|-|-|
 | Training  | 413    | Model development |
 | Testing   | 103    | Final evaluation (one-time) |
 | **Total** | **516** | |
@@ -203,7 +203,7 @@ DOI: 10.21227/H25W98
 ### 16.1 Original DR Grades
 
 | Grade | Description | ICDR Equivalent |
-|-------|-------------|-----------------|
+|-|-|-|
 | 0 | No apparent retinopathy | No DR |
 | 1 | Mild non-proliferative DR | Mild NPDR |
 | 2 | Moderate non-proliferative DR | Moderate NPDR |
@@ -213,7 +213,7 @@ DOI: 10.21227/H25W98
 ### 16.2 Binary Target (Study-Specific)
 
 | Class | DR Grades | Label |
-|-------|-----------|-------|
+|-|-|-|
 | 0 | 0, 1 | DR grade < 2 |
 | 1 | 2, 3, 4 | DR grade ≥ 2 |
 
@@ -227,7 +227,7 @@ DOI: 10.21227/H25W98
 ### 16.3 DME Grades (Descriptive Analysis Only)
 
 | Grade | Description |
-|-------|-------------|
+|-|-|
 | 0 | No apparent DME |
 | 1 | DME present but not clinically significant |
 | 2 | Clinically significant DME |

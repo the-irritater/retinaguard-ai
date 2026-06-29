@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — PyTorch Dataset
-==================================
+RetinaGuard AI - PyTorch Dataset
+-
 Purpose: PyTorch Dataset class for loading IDRiD retinal fundus images
 with proper preprocessing and augmentation handling.
 

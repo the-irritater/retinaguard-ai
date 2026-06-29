@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Model Calibration Analysis
-============================================
+RetinaGuard AI - Model Calibration Analysis
+-
 Purpose: Assess and adjust model calibration. Computes ECE, Brier score,
 calibration slope, and calibration intercept. Implements post-hoc
 temperature scaling.
@@ -31,9 +31,9 @@ from sklearn.linear_model import LogisticRegression
 logger = logging.getLogger("retinaguard.calibration")
 
 
-# ---------------------------------------------------------------------------
+# -
 # ECE Calculation
-# ---------------------------------------------------------------------------
+# -
 def compute_ece(
     y_true: np.ndarray,
     y_prob: np.ndarray,
@@ -71,9 +71,9 @@ def compute_ece(
     return float(ece)
 
 
-# ---------------------------------------------------------------------------
+# -
 # Calibration Curve, Slope, and Intercept
-# ---------------------------------------------------------------------------
+# -
 def compute_calibration_stats(
     y_true: np.ndarray,
     y_prob: np.ndarray,
@@ -127,9 +127,9 @@ def compute_calibration_stats(
     }
 
 
-# ---------------------------------------------------------------------------
+# -
 # Temperature Scaling
-# ---------------------------------------------------------------------------
+# -
 class TemperatureScaler(nn.Module):
     """Temperature scaling post-processing module.
 

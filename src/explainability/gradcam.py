@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Grad-CAM visual explanations
-================================================
+RetinaGuard AI - Grad-CAM visual explanations
+-
 Purpose: Generate visual explanations for model predictions using Grad-CAM.
 
 Key design decisions:
@@ -216,9 +216,9 @@ class GradCAMExplainer:
         return overlay, cam
 
 
-# ---------------------------------------------------------------------------
+# -
 # Explainability Plotting Utility
-# ---------------------------------------------------------------------------
+# -
 def plot_gradcam_panel(
     original_img: np.ndarray,
     overlay_img: np.ndarray,

@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — External Dataset Adapter
-===========================================
+RetinaGuard AI - External Dataset Adapter
+-
 Purpose: Standarise external retinal datasets (e.g. APTOS, Messidor-2, EyePACS)
 to match the input format, preprocessing pipeline, and labels expected by the
 trained RetinaGuard AI models.
@@ -167,9 +167,9 @@ class ExternalDatasetAdapter:
         return adapted_df
 
 
-# ---------------------------------------------------------------------------
+# -
 # Cross-Dataset Performance Delta Report Utility
-# ---------------------------------------------------------------------------
+# -
 def compute_performance_delta(
     internal_metrics: Dict[str, float],
     external_metrics: Dict[str, float],

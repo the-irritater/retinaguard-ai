@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — IDRiD Dataset Audit
-=====================================
+RetinaGuard AI - IDRiD Dataset Audit
+-
 Purpose: Discover, validate, and characterise all images and labels in the
 IDRiD dataset. Produces a master metadata CSV and an audit summary report.
 
@@ -35,9 +35,9 @@ import numpy as np
 import pandas as pd
 import yaml
 
-# ---------------------------------------------------------------------------
+# -
 # Logging
-# ---------------------------------------------------------------------------
+# -
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -45,9 +45,9 @@ logging.basicConfig(
 logger = logging.getLogger("retinaguard.audit")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Configuration loader
-# ---------------------------------------------------------------------------
+# -
 def load_config(config_path: Path) -> dict[str, Any]:
     """Load YAML configuration file.
 
@@ -66,9 +66,9 @@ def load_config(config_path: Path) -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
-# ---------------------------------------------------------------------------
+# -
 # Image discovery
-# ---------------------------------------------------------------------------
+# -
 def discover_images(
     root_dir: Path, extensions: list[str]
 ) -> list[dict[str, Any]]:
@@ -106,9 +106,9 @@ def discover_images(
     return images
 
 
-# ---------------------------------------------------------------------------
+# -
 # Label loading
-# ---------------------------------------------------------------------------
+# -
 def load_labels(
     labels_dir: Path,
     train_csv_name: str,
@@ -181,9 +181,9 @@ def load_labels(
     return combined
 
 
-# ---------------------------------------------------------------------------
+# -
 # File hash calculation
-# ---------------------------------------------------------------------------
+# -
 def calculate_md5(filepath: str) -> str:
     """Calculate MD5 hash of a file for duplicate detection.
 
@@ -200,9 +200,9 @@ def calculate_md5(filepath: str) -> str:
     return hasher.hexdigest()
 
 
-# ---------------------------------------------------------------------------
+# -
 # Image quality metrics
-# ---------------------------------------------------------------------------
+# -
 def compute_image_metrics(filepath: str) -> dict[str, Any]:
     """Compute quality metrics for a single image.
 
@@ -265,9 +265,9 @@ def compute_image_metrics(filepath: str) -> dict[str, Any]:
     return result
 
 
-# ---------------------------------------------------------------------------
+# -
 # Matching images to labels
-# ---------------------------------------------------------------------------
+# -
 def match_images_to_labels(
     images: list[dict[str, Any]], labels: pd.DataFrame
 ) -> pd.DataFrame:
@@ -308,9 +308,9 @@ def match_images_to_labels(
     return master
 
 
-# ---------------------------------------------------------------------------
+# -
 # Duplicate detection
-# ---------------------------------------------------------------------------
+# -
 def detect_duplicates(master: pd.DataFrame) -> dict[str, Any]:
     """Detect filename and content duplicates.
 
@@ -345,9 +345,9 @@ def detect_duplicates(master: pd.DataFrame) -> dict[str, Any]:
     return results
 
 
-# ---------------------------------------------------------------------------
+# -
 # Binary target creation
-# ---------------------------------------------------------------------------
+# -
 def create_binary_target(master: pd.DataFrame) -> pd.DataFrame:
     """Add binary classification target column.
 
@@ -377,9 +377,9 @@ def create_binary_target(master: pd.DataFrame) -> pd.DataFrame:
     return master
 
 
-# ---------------------------------------------------------------------------
+# -
 # Generate audit summary report
-# ---------------------------------------------------------------------------
+# -
 def generate_audit_report(
     master: pd.DataFrame,
     duplicates: dict[str, Any],
@@ -406,7 +406,7 @@ def generate_audit_report(
     # Overview
     lines.append("## 1. Overview\n")
     lines.append(f"| Metric | Count |")
-    lines.append(f"|--------|-------|")
+    lines.append(f"|-|-|")
     lines.append(f"| Total image files discovered | {master['filename'].notna().sum()} |")
     lines.append(f"| Total label records | {master['image_id'].notna().sum()} |")
     lines.append(f"| Matched (image + label) | {(master['match_status'] == 'matched').sum()} |")
@@ -421,7 +421,7 @@ def generate_audit_report(
     if "partition" in matched.columns:
         part_counts = matched["partition"].value_counts()
         lines.append("| Partition | Images |")
-        lines.append("|-----------|--------|")
+        lines.append("|-|-|")
         for part, count in sorted(part_counts.items()):
             lines.append(f"| {part} | {count} |")
         lines.append("")
@@ -431,7 +431,7 @@ def generate_audit_report(
     if "dr_grade" in matched.columns:
         dr_counts = matched["dr_grade"].value_counts().sort_index()
         lines.append("| DR Grade | Count | Percentage |")
-        lines.append("|----------|-------|------------|")
+        lines.append("|-|-|-|")
         total = dr_counts.sum()
         for grade, count in dr_counts.items():
             pct = round(100 * count / total, 1)
@@ -445,7 +445,7 @@ def generate_audit_report(
     if "binary_label" in matched.columns:
         bin_counts = matched["binary_label"].value_counts().sort_index()
         lines.append("| Binary Label | Count | Percentage |")
-        lines.append("|-------------|-------|------------|")
+        lines.append("|-|-|-|")
         total = bin_counts.sum()
         for label, count in bin_counts.items():
             name = "DR grade < 2" if label == 0 else "DR grade >= 2"
@@ -458,7 +458,7 @@ def generate_audit_report(
     if "dme_grade" in matched.columns:
         dme_counts = matched["dme_grade"].value_counts().sort_index()
         lines.append("| DME Grade | Count | Percentage |")
-        lines.append("|-----------|-------|------------|")
+        lines.append("|-|-|-|")
         total = dme_counts.sum()
         for grade, count in dme_counts.items():
             pct = round(100 * count / total, 1)
@@ -469,7 +469,7 @@ def generate_audit_report(
     lines.append("## 6. Image Dimensions\n")
     if "width" in readable.columns:
         lines.append(f"| Statistic | Width | Height |")
-        lines.append(f"|-----------|-------|--------|")
+        lines.append(f"|-|-|-|")
         for stat in ["min", "max", "mean", "median", "std"]:
             w = readable["width"].agg(stat)
             h = readable["height"].agg(stat)
@@ -488,7 +488,7 @@ def generate_audit_report(
             vals = readable[metric].dropna()
             lines.append(f"### {label}\n")
             lines.append(f"| Statistic | Value |")
-            lines.append(f"|-----------|-------|")
+            lines.append(f"|-|-|")
             lines.append(f"| Min | {vals.min():.2f} |")
             lines.append(f"| Max | {vals.max():.2f} |")
             lines.append(f"| Mean | {vals.mean():.2f} |")
@@ -540,9 +540,9 @@ def generate_audit_report(
                     "PASS" if not duplicates["hash_duplicates"] else "WARN"))
 
     lines.append("| Check | Status |")
-    lines.append("|-------|--------|")
+    lines.append("|-|-|")
     for check, status in checks:
-        emoji = "✅" if status == "PASS" else ("⚠️" if status == "WARN" else "❌")
+        emoji = "" if status == "PASS" else ("" if status == "WARN" else "")
         lines.append(f"| {check} | {emoji} {status} |")
     lines.append("")
 
@@ -552,9 +552,9 @@ def generate_audit_report(
     logger.info(f"Audit report written to {output_path}")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Main audit pipeline
-# ---------------------------------------------------------------------------
+# -
 def run_audit(config_path: Path) -> pd.DataFrame:
     """Execute the complete dataset audit pipeline.
 
@@ -577,7 +577,7 @@ def run_audit(config_path: Path) -> pd.DataFrame:
     ds_config = config["dataset"]
 
     logger.info("=" * 60)
-    logger.info("RetinaGuard AI — IDRiD Dataset Audit")
+    logger.info("RetinaGuard AI - IDRiD Dataset Audit")
     logger.info("=" * 60)
 
     # Step 1: Discover images
@@ -686,13 +686,13 @@ def run_audit(config_path: Path) -> pd.DataFrame:
     return master
 
 
-# ---------------------------------------------------------------------------
+# -
 # CLI entry point
-# ---------------------------------------------------------------------------
+# -
 def main() -> None:
     """CLI entry point for the data audit."""
     parser = argparse.ArgumentParser(
-        description="RetinaGuard AI — IDRiD Dataset Audit"
+        description="RetinaGuard AI - IDRiD Dataset Audit"
     )
     parser.add_argument(
         "--config",

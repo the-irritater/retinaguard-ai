@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Baseline Classifiers
-=======================================
+RetinaGuard AI - Baseline Classifiers
+-
 Purpose: Simple and classical baseline models for DR classification.
 - Majority class classifier: predicts the most frequent class.
 - Frozen pretrained ResNet18 feature extractor with simple linear classifier.
@@ -28,9 +28,9 @@ import torchvision.models as models
 logger = logging.getLogger("retinaguard.baselines")
 
 
-# ---------------------------------------------------------------------------
+# -
 # 1. Majority Class Baseline
-# ---------------------------------------------------------------------------
+# -
 class MajorityClassifier:
     """Predicts the most frequent class in the training labels.
 
@@ -87,9 +87,9 @@ class MajorityClassifier:
         return probs
 
 
-# ---------------------------------------------------------------------------
+# -
 # 2 & 3. Classical Logistic Regression on Pretrained Image Embeddings
-# ---------------------------------------------------------------------------
+# -
 class LogisticRegressionBaseline:
     """Extracts features using a frozen ResNet18 backbone, and fits a Logistic Regression model.
 

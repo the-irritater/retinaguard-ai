@@ -1,12 +1,12 @@
-# 👁️ RetinaGuard AI
+#  RetinaGuard AI
 
 **An Explainable Deep-Learning System for Diabetic Retinopathy Screening and Patient Education**
 
-> ⚠️ **RESEARCH PROTOTYPE — NOT A DIAGNOSTIC TOOL.** This system is NOT a medical device, NOT clinically validated, and NOT approved by any regulatory authority. It must NOT be used for diagnosis or treatment decisions.
+>  **RESEARCH PROTOTYPE - NOT A DIAGNOSTIC TOOL.** This system is NOT a medical device, NOT clinically validated, and NOT approved by any regulatory authority. It must NOT be used for diagnosis or treatment decisions.
 
 ---
 
-## 📋 Project Overview
+##  Project Overview
 
 RetinaGuard AI is an academic research prototype that analyses retinal fundus photographs to:
 
@@ -17,7 +17,7 @@ RetinaGuard AI is an academic research prototype that analyses retinal fundus ph
 5. **Recommend** professional ophthalmologist assessment for all findings.
 6. **State clearly** that the system is not a diagnostic tool.
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 retinaguard-ai/
@@ -69,7 +69,7 @@ retinaguard-ai/
 └── README.md
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone and Install
 
@@ -130,7 +130,7 @@ PYTHONPATH=. python -m src.evaluation.run_evaluation \
 streamlit run app/streamlit_app.py
 ```
 
-## 🧪 Running Tests
+##  Running Tests
 
 ```bash
 PYTHONPATH=. pytest tests/ -v
@@ -139,15 +139,15 @@ PYTHONPATH=. pytest tests/ -v
 All 20 tests should pass:
 
 ```
-tests/test_baselines.py           ✓ 2 passed
-tests/test_dataset.py             ✓ 4 passed
-tests/test_metrics.py             ✓ 7 passed
-tests/test_preprocessing.py       ✓ 4 passed
-tests/test_splitting.py           ✓ 3 passed
-======================== 20 passed ========================
+tests/test_baselines.py            2 passed
+tests/test_dataset.py              4 passed
+tests/test_metrics.py              7 passed
+tests/test_preprocessing.py        4 passed
+tests/test_splitting.py            3 passed
+- 20 passed -
 ```
 
-## 📊 Methodology
+##  Methodology
 
 ### Model Selection Protocol
 
@@ -174,7 +174,7 @@ Evaluate ONCE on official test set
 | **Temperature scaling** | Post-hoc calibration fitted on validation set |
 | **Grad-CAM disclaimer** | Heatmaps are NOT confirmed lesion boundaries |
 
-## 📄 Documentation
+##  Documentation
 
 | Document | Description |
 |---|---|
@@ -183,11 +183,11 @@ Evaluate ONCE on official test set
 | [Error Analysis](reports/error_analysis_report.md) | Systematic error categorisation |
 | [Bootstrap CIs](reports/tables/test_bootstrap_ci.md) | Test metrics with confidence intervals |
 
-## ⚖️ License
+##  License
 
-MIT License with Medical Disclaimer — see [LICENSE](LICENSE).
+MIT License with Medical Disclaimer - see [LICENSE](LICENSE).
 
-## 📚 Citation
+##  Citation
 
 If you use this project in your research, please cite:
 
@@ -195,7 +195,7 @@ If you use this project in your research, please cite:
 @misc{retinaguard2026,
   title={RetinaGuard AI: An Explainable Deep-Learning System for Diabetic Retinopathy Screening},
   year={2026},
-  note={Research prototype — not clinically validated}
+  note={Research prototype - not clinically validated}
 }
 ```
 

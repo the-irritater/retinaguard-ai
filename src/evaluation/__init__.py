@@ -1,1 +1,1 @@
-"""RetinaGuard AI — Evaluation Package."""
+"""RetinaGuard AI - Evaluation Package."""

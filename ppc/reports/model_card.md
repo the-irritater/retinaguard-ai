@@ -1,12 +1,12 @@
-# RetinaGuard AI — Model Card
+# RetinaGuard AI - Model Card
 
 > **Version:** 1.0.0  
 > **Last Updated:** 2026-06-29  
-> **Status:** Research Prototype — NOT a diagnostic tool
+> **Status:** Research Prototype - NOT a diagnostic tool
 
 ---
 
-## ⚠️ Intended Use Disclaimer
+##  Intended Use Disclaimer
 
 **This system is an academic research prototype. It is NOT a medical device, NOT clinically validated, and NOT approved by any regulatory body (FDA, CE, TGA, or equivalent). It must NOT be used to make diagnostic or treatment decisions. All outputs require independent verification by a qualified ophthalmologist.**
 
@@ -34,10 +34,10 @@
 - Educational tool for understanding model behaviour and limitations.
 
 ### Out-of-Scope Uses
-- **Clinical diagnosis or screening** — the model has NOT been validated for clinical use.
-- **Treatment planning or patient management** — the model is NOT a decision support tool.
-- **Deployment on populations not represented by IDRiD** — the model was trained on a single Indian dataset and may not generalise.
-- **Use without ophthalmologist oversight** — all model outputs must be reviewed by a qualified professional.
+- **Clinical diagnosis or screening** - the model has NOT been validated for clinical use.
+- **Treatment planning or patient management** - the model is NOT a decision support tool.
+- **Deployment on populations not represented by IDRiD** - the model was trained on a single Indian dataset and may not generalise.
+- **Use without ophthalmologist oversight** - all model outputs must be reviewed by a qualified professional.
 
 ## 3. Training Methodology
 
@@ -49,8 +49,8 @@
 5. **Augmentation (training only):** Rotation (±15°), shift/scale, brightness/contrast adjustment. **No horizontal flip** (preserves retinal laterality).
 
 ### Training Strategy
-1. **Stage 1 — Head training:** Backbone frozen, only classifier head trained (5 epochs).
-2. **Stage 2 — Fine-tuning:** Last backbone layers unfrozen, end-to-end training with reduced LR (15 epochs).
+1. **Stage 1 - Head training:** Backbone frozen, only classifier head trained (5 epochs).
+2. **Stage 2 - Fine-tuning:** Last backbone layers unfrozen, end-to-end training with reduced LR (15 epochs).
 3. **Early stopping:** Patience of 5 epochs on validation balanced accuracy.
 4. **Loss function:** Weighted cross-entropy with class-frequency-based weights.
 

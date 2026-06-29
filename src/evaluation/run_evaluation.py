@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Model Evaluation Orchestrator
-===============================================
+RetinaGuard AI - Model Evaluation Orchestrator
+-
 Purpose: Load the trained model and perform the final test evaluation,
 calibration, bootstrapping, error analysis, and Grad-CAM generation.
 
@@ -53,9 +53,9 @@ from src.explainability.gradcam import GradCAMExplainer, plot_gradcam_panel
 logger = logging.getLogger("retinaguard.evaluation")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Plotting Helpers
-# ---------------------------------------------------------------------------
+# -
 def plot_curves(
     y_true: np.ndarray,
     y_prob: np.ndarray,
@@ -157,9 +157,9 @@ def plot_curves(
     logger.info(f"Evaluation plots saved to {figures_dir}")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Evaluation orchestrator
-# ---------------------------------------------------------------------------
+# -
 def run_evaluation(
     config_path: Path,
     checkpoint_path: Path,
@@ -198,7 +198,7 @@ def run_evaluation(
             )
 
     logger.info("=" * 60)
-    logger.info("RetinaGuard AI — Final Test Evaluation")
+    logger.info("RetinaGuard AI - Final Test Evaluation")
     logger.info(f"  Config:     {config_path}")
     logger.info(f"  Checkpoint: {checkpoint_path}")
     logger.info(f"  Task:       {task}")

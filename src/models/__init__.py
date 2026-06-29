@@ -1,1 +1,1 @@
-"""RetinaGuard AI — Models Package."""
+"""RetinaGuard AI - Models Package."""

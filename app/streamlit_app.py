@@ -1,11 +1,11 @@
 """
-RetinaGuard AI — Streamlit Demonstration Application
-=====================================================
+RetinaGuard AI - Streamlit Demonstration Application
+-
 Purpose: Interactive web interface for demonstrating the DR classification
 system. Allows uploading retinal images, viewing predictions, confidence,
 Grad-CAM overlays, and patient education information.
 
-⚠️ THIS IS A RESEARCH DEMONSTRATION — NOT A DIAGNOSTIC TOOL ⚠️
+ THIS IS A RESEARCH DEMONSTRATION - NOT A DIAGNOSTIC TOOL 
 
 Usage:
     streamlit run app/streamlit_app.py
@@ -25,19 +25,19 @@ import yaml
 
 # Configure page
 st.set_page_config(
-    page_title="RetinaGuard AI — DR Screening Research Demo",
-    page_icon="👁️",
+    page_title="RetinaGuard AI - DR Screening Research Demo",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 logger = logging.getLogger("retinaguard.app")
 
-# ---------------------------------------------------------------------------
+# -
 # Constants
-# ---------------------------------------------------------------------------
+# -
 DISCLAIMER_BANNER = """
-⚠️ **RESEARCH PROTOTYPE — NOT A DIAGNOSTIC TOOL**
+ **RESEARCH PROTOTYPE - NOT A DIAGNOSTIC TOOL**
 
 This system is an academic research demonstration. It is **NOT** a medical device,
 **NOT** clinically validated, and **NOT** approved by any regulatory authority
@@ -52,14 +52,14 @@ GRADCAM_DISCLAIMER = (
 )
 
 PATIENT_EDUCATION = """
-### 📚 About Diabetic Retinopathy
+###  About Diabetic Retinopathy
 
 Diabetic retinopathy (DR) is a complication of diabetes that affects the blood
-vessels in the retina — the light-sensitive tissue at the back of the eye.
+vessels in the retina - the light-sensitive tissue at the back of the eye.
 
 **Key Facts:**
 - DR is the leading cause of preventable blindness in working-age adults.
-- Early stages often have **no symptoms** — regular screening is essential.
+- Early stages often have **no symptoms** - regular screening is essential.
 - Effective treatments exist, especially when DR is detected early.
 - Good blood sugar, blood pressure, and cholesterol control can slow progression.
 
@@ -73,18 +73,18 @@ vessels in the retina — the light-sensitive tissue at the back of the eye.
 | 4 | Proliferative DR | Neovascularisation, vitreous haemorrhage |
 
 **What should you do?**
-- 🩺 See an ophthalmologist for regular dilated eye exams.
-- 📊 Maintain good glycaemic control (HbA1c < 7% as advised by your doctor).
-- 🚫 Do not rely on any AI system for medical decisions.
+-  See an ophthalmologist for regular dilated eye exams.
+-  Maintain good glycaemic control (HbA1c < 7% as advised by your doctor).
+-  Do not rely on any AI system for medical decisions.
 
 > **Important:** This educational information is general in nature. Consult your
 > healthcare provider for advice specific to your situation.
 """
 
 
-# ---------------------------------------------------------------------------
+# -
 # Model Loading (cached)
-# ---------------------------------------------------------------------------
+# -
 @st.cache_resource
 def load_model(config_path: str, checkpoint_path: str):
     """Load model and config from disk (cached across sessions)."""
@@ -106,9 +106,9 @@ def load_model(config_path: str, checkpoint_path: str):
     if checkpoint_p.exists():
         checkpoint = torch.load(checkpoint_p, map_location=device, weights_only=False)
         model.load_state_dict(checkpoint["model_state_dict"])
-        st.sidebar.success(f"✅ Model loaded from checkpoint")
+        st.sidebar.success(f" Model loaded from checkpoint")
     else:
-        st.sidebar.warning("⚠️ No checkpoint found — using random weights for demo")
+        st.sidebar.warning(" No checkpoint found - using random weights for demo")
     
     model = model.to(device)
     model.eval()
@@ -142,9 +142,9 @@ def generate_gradcam(model, image_tensor, device):
     return overlay, heatmap
 
 
-# ---------------------------------------------------------------------------
+# -
 # UI Layout
-# ---------------------------------------------------------------------------
+# -
 def main():
     """Main Streamlit application."""
     
@@ -184,12 +184,12 @@ def main():
         show_education = st.checkbox("Show Patient Education", value=False)
         
         st.divider()
-        st.markdown("📋 [View Model Card](reports/model_card.md)")
-        st.markdown("📄 [View Study Protocol](reports/study_protocol.md)")
+        st.markdown(" [View Model Card](reports/model_card.md)")
+        st.markdown(" [View Study Protocol](reports/study_protocol.md)")
     
     # --- Main Content ---
     st.markdown(DISCLAIMER_BANNER)
-    st.title("👁️ RetinaGuard AI")
+    st.title(" RetinaGuard AI")
     st.subheader("Explainable Deep Learning for Diabetic Retinopathy Research")
     
     # File uploader
@@ -205,7 +205,7 @@ def main():
         image_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
         
         if image_bgr is None:
-            st.error("❌ Could not read the uploaded image. Please try a different file.")
+            st.error(" Could not read the uploaded image. Please try a different file.")
             return
             
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
@@ -220,7 +220,7 @@ def main():
             try:
                 model, config, device = load_model(config_path, checkpoint_path)
             except Exception as e:
-                st.error(f"❌ Failed to load model: {e}")
+                st.error(f" Failed to load model: {e}")
                 return
         
         # Preprocess
@@ -228,7 +228,7 @@ def main():
             try:
                 image_tensor = preprocess_for_inference(image_rgb, config)
             except Exception as e:
-                st.error(f"❌ Preprocessing failed: {e}")
+                st.error(f" Preprocessing failed: {e}")
                 return
         
         # Inference
@@ -248,9 +248,9 @@ def main():
         with col2:
             # Result card
             if prob_positive >= threshold:
-                st.error(f"🔴 **{prediction}**")
+                st.error(f" **{prediction}**")
             else:
-                st.success(f"🟢 **{prediction}**")
+                st.success(f" **{prediction}**")
             
             st.metric("Probability (DR ≥ 2)", f"{prob_positive:.4f}")
             st.metric("Model Confidence", f"{confidence:.2%}")
@@ -258,13 +258,13 @@ def main():
             
             # Uncertainty indicator
             if confidence < 0.6:
-                st.warning("⚠️ **Low confidence prediction** — model is uncertain about this image.")
+                st.warning(" **Low confidence prediction** - model is uncertain about this image.")
             elif confidence < 0.8:
-                st.info("ℹ️ Moderate confidence — consider additional review.")
+                st.info(" Moderate confidence - consider additional review.")
         
         # Professional recommendation
         st.divider()
-        st.markdown("### 🩺 Professional Assessment Recommendation")
+        st.markdown("###  Professional Assessment Recommendation")
         st.info(
             "**This result requires verification by a qualified ophthalmologist.** "
             "This system is a research prototype and cannot replace professional "
@@ -275,8 +275,8 @@ def main():
         # Grad-CAM
         if show_gradcam:
             st.divider()
-            st.markdown("### 🔍 Grad-CAM Visual Explanation")
-            st.warning(f"⚠️ {GRADCAM_DISCLAIMER}")
+            st.markdown("###  Grad-CAM Visual Explanation")
+            st.warning(f" {GRADCAM_DISCLAIMER}")
             
             with st.spinner("Generating Grad-CAM overlay..."):
                 try:
@@ -320,7 +320,7 @@ def main():
         
         st.markdown("---")
         st.markdown(
-            "### ⚡ System Capabilities\n"
+            "###  System Capabilities\n"
             "| Feature | Description |\n"
             "|---|---|\n"
             "| **Binary Classification** | Detects DR grade ≥ 2 (moderate NPDR or worse) |\n"
@@ -334,7 +334,7 @@ def main():
     # Footer
     st.markdown("---")
     st.caption(
-        "RetinaGuard AI v1.0 — Research Prototype | "
+        "RetinaGuard AI v1.0 - Research Prototype | "
         "NOT a medical device | NOT clinically validated | "
         "Consult a qualified ophthalmologist for all clinical decisions"
     )

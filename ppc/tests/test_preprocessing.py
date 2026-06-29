@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Preprocessing Unit Tests
-==========================================
+RetinaGuard AI - Preprocessing Unit Tests
+-
 Purpose: Verify that the preprocessing pipeline behaves correctly:
 - Correct output size (384x384 by default).
 - No augmentation is applied during validation or testing.

@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Evaluation Metrics Unit Tests
-===============================================
+RetinaGuard AI - Evaluation Metrics Unit Tests
+-
 Purpose: Verify that metric computations, threshold selection, calibration
 error calculations, and bootstrapping function correctly under dummy scenarios.
 """

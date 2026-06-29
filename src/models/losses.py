@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Loss Functions
-================================
+RetinaGuard AI - Loss Functions
+-
 Purpose: Loss functions for DR classification including weighted
 cross-entropy and focal loss.
 
@@ -133,7 +133,7 @@ def create_loss_function(
 
     elif loss_type == "focal":
         logger.info(
-            f"Using focal loss (gamma={focal_gamma}) — "
+            f"Using focal loss (gamma={focal_gamma}) - "
             f"sensitivity analysis option"
         )
         return FocalLoss(

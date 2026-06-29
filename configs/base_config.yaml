@@ -1,8 +1,8 @@
-# =============================================================================
-# RetinaGuard AI — Base Configuration
-# =============================================================================
+# -
+# RetinaGuard AI - Base Configuration
+# -
 # This is a research prototype. Not a diagnostic tool.
-# =============================================================================
+# -
 
 project:
   name: "RetinaGuard AI"
@@ -13,9 +13,9 @@ project:
     has NOT received regulatory approval, and MUST NOT be used for clinical
     diagnosis, treatment decisions, or patient management.
 
-# ---------------------------------------------------------------------------
+# -
 # Paths (relative to project root)
-# ---------------------------------------------------------------------------
+# -
 paths:
   data_root: "data/raw"
   interim_dir: "data/interim"
@@ -27,12 +27,12 @@ paths:
   tables_dir: "reports/tables"
   reports_dir: "reports"
 
-# ---------------------------------------------------------------------------
+# -
 # IDRiD dataset expected structure inside data/raw/
-# ---------------------------------------------------------------------------
+# -
 dataset:
   name: "IDRiD"
-  # Expected subdirectory names — adjust if your download names differ
+  # Expected subdirectory names - adjust if your download names differ
   train_images_dir: "1. Original Images/a. Training Set"
   test_images_dir: "1. Original Images/b. Testing Set"
   lesion_masks_dir: "2. All Segmentation Groundtruths"
@@ -45,9 +45,9 @@ dataset:
   dr_grade_col: "Retinopathy grade"
   dme_grade_col: "Risk of macular edema "  # Note: trailing space in original
 
-# ---------------------------------------------------------------------------
+# -
 # Binary target definition
-# ---------------------------------------------------------------------------
+# -
 binary_target:
   name: "DR grade ≥2"
   description: >
@@ -60,14 +60,14 @@ binary_target:
   negative_label: "DR grade < 2"
   positive_label: "DR grade >= 2"
 
-# ---------------------------------------------------------------------------
+# -
 # Reproducibility
-# ---------------------------------------------------------------------------
+# -
 seed: 42
 
-# ---------------------------------------------------------------------------
+# -
 # Data splitting
-# ---------------------------------------------------------------------------
+# -
 splitting:
   # Official IDRiD split is preserved
   # CV folds created only from official training set
@@ -80,9 +80,9 @@ splitting:
     provide a clearly documented patient-grouping variable. Patient-level
     leakage cannot be independently verified.
 
-# ---------------------------------------------------------------------------
+# -
 # Preprocessing
-# ---------------------------------------------------------------------------
+# -
 preprocessing:
   # Resolution experiment: compare 224, 384, 512 via CV
   image_size: 384
@@ -94,9 +94,9 @@ preprocessing:
   border_threshold: 10  # pixel intensity threshold for border detection
   min_crop_ratio: 0.5   # minimum ratio to preserve (safety)
 
-# ---------------------------------------------------------------------------
-# Augmentation — medically conservative, NO horizontal flip
-# ---------------------------------------------------------------------------
+# -
+# Augmentation - medically conservative, NO horizontal flip
+# -
 augmentation:
   # Horizontal flip EXCLUDED from baseline (changes retinal laterality)
   horizontal_flip: false
@@ -110,9 +110,9 @@ augmentation:
   brightness_limit: 0.1
   contrast_limit: 0.1
 
-# ---------------------------------------------------------------------------
+# -
 # Training
-# ---------------------------------------------------------------------------
+# -
 training:
   # Two-stage transfer learning
   stage1:
@@ -139,9 +139,9 @@ training:
     T_max: 50
     eta_min: 1.0e-6
 
-# ---------------------------------------------------------------------------
+# -
 # Loss
-# ---------------------------------------------------------------------------
+# -
 loss:
   primary: "weighted_cross_entropy"
   # Focal loss as sensitivity analysis
@@ -149,9 +149,9 @@ loss:
     gamma: 2.0
     alpha: null  # compute from class frequencies
 
-# ---------------------------------------------------------------------------
+# -
 # Threshold selection (validation set only)
-# ---------------------------------------------------------------------------
+# -
 threshold:
   methods: ["youden", "sensitivity_target", "fixed"]
   sensitivity_target: 0.90
@@ -160,9 +160,9 @@ threshold:
     Threshold is selected using validation data only.
     The test set is never used for threshold selection.
 
-# ---------------------------------------------------------------------------
+# -
 # Evaluation
-# ---------------------------------------------------------------------------
+# -
 evaluation:
   bootstrap:
     n_resamples: 2000
@@ -173,9 +173,9 @@ evaluation:
     method: "temperature_scaling"
     fit_on: "validation"
 
-# ---------------------------------------------------------------------------
+# -
 # Explainability
-# ---------------------------------------------------------------------------
+# -
 explainability:
   method: "grad-cam"
   target_layer: null  # set automatically per architecture

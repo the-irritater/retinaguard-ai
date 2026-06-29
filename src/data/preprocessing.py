@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Image Preprocessing Pipeline
-===============================================
+RetinaGuard AI - Image Preprocessing Pipeline
+-
 Purpose: Safely read, crop, resize, normalise, and augment retinal fundus
 images for model training and inference.
 
@@ -30,9 +30,9 @@ from albumentations.pytorch import ToTensorV2
 logger = logging.getLogger("retinaguard.preprocessing")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Black border detection and cropping
-# ---------------------------------------------------------------------------
+# -
 def detect_and_crop_borders(
     image: np.ndarray,
     threshold: int = 10,
@@ -63,7 +63,7 @@ def detect_and_crop_borders(
     coords = np.argwhere(mask)
 
     if len(coords) == 0:
-        logger.warning("Image appears entirely black — returning original")
+        logger.warning("Image appears entirely black - returning original")
         return image
 
     y_min, x_min = coords.min(axis=0)
@@ -92,9 +92,9 @@ def detect_and_crop_borders(
     return cropped
 
 
-# ---------------------------------------------------------------------------
+# -
 # Safe image reading
-# ---------------------------------------------------------------------------
+# -
 def read_image_safely(
     filepath: str | Path,
 ) -> Optional[np.ndarray]:
@@ -120,9 +120,9 @@ def read_image_safely(
         return None
 
 
-# ---------------------------------------------------------------------------
+# -
 # Preprocessing pipeline
-# ---------------------------------------------------------------------------
+# -
 def preprocess_image(
     image: np.ndarray,
     image_size: int = 384,
@@ -169,9 +169,9 @@ def preprocess_image(
     return image
 
 
-# ---------------------------------------------------------------------------
+# -
 # Albumentations transform pipelines
-# ---------------------------------------------------------------------------
+# -
 def get_training_transforms(
     image_size: int = 384,
     mean: list[float] | None = None,
@@ -218,7 +218,7 @@ def get_training_transforms(
     if horizontal_flip:
         transforms_list.append(A.HorizontalFlip(p=0.5))
         logger.warning(
-            "Horizontal flip enabled — this changes retinal laterality. "
+            "Horizontal flip enabled - this changes retinal laterality. "
             "Use only as ablation experiment."
         )
 

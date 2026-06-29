@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Baseline Models Unit Tests
-===========================================
+RetinaGuard AI - Baseline Models Unit Tests
+-
 Purpose: Verify that MajorityClassifier and LogisticRegressionBaseline fit and
 predict correctly.
 """

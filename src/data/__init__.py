@@ -1,1 +1,1 @@
-"""RetinaGuard AI — Data Processing Package."""
+"""RetinaGuard AI - Data Processing Package."""

@@ -1,4 +1,4 @@
-# RetinaGuard AI — Systematic Error Analysis Report
+# RetinaGuard AI - Systematic Error Analysis Report
 
 **Classification Threshold:** inf
 
@@ -24,7 +24,7 @@
 
 **Total Count:** 0
 
-No high-confidence mistakes found ✓
+No high-confidence mistakes found 
 
 
 

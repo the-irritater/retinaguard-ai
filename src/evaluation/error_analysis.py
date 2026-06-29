@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Systematic Error Analysis
-============================================
+RetinaGuard AI - Systematic Error Analysis
+-
 Purpose: Analyse classification errors, categorise failure modes, and evaluate
 performance across image quality quartiles and disease grades.
 
@@ -152,7 +152,7 @@ def generate_markdown_report(df: pd.DataFrame, report_path: Path, threshold: flo
     error_rate = n_errors / total if total > 0 else 0
 
     lines: list[str] = []
-    lines.append("# RetinaGuard AI — Systematic Error Analysis Report\n")
+    lines.append("# RetinaGuard AI - Systematic Error Analysis Report\n")
     lines.append(f"**Classification Threshold:** {threshold:.4f}\n")
     lines.append(f"**Total Samples Evaluated:** {total}\n")
     lines.append(f"**Total Errors:** {n_errors} (Error Rate: {error_rate:.2%})\n")
@@ -185,7 +185,7 @@ def generate_markdown_report(df: pd.DataFrame, report_path: Path, threshold: flo
                 f"{row.get('sharpness', 0):.1f} |"
             )
     else:
-        lines.append("No high-confidence mistakes found ✓\n")
+        lines.append("No high-confidence mistakes found \n")
     lines.append("\n")
 
     # 3. Low-confidence correct predictions

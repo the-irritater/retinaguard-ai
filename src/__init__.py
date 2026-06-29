@@ -1,1 +1,1 @@
-"""RetinaGuard AI — Source Package."""
+"""RetinaGuard AI - Source Package."""

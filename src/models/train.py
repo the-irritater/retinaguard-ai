@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Training Pipeline
-====================================
+RetinaGuard AI - Training Pipeline
+-
 Purpose: Complete training loop with two-stage transfer learning,
 cross-validation, early stopping, mixed-precision training, and
 checkpoint management.
@@ -39,9 +39,9 @@ from src.models.losses import create_loss_function
 logger = logging.getLogger("retinaguard.train")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Reproducibility
-# ---------------------------------------------------------------------------
+# -
 def set_seed(seed: int) -> None:
     """Set random seeds for reproducibility.
 
@@ -58,9 +58,9 @@ def set_seed(seed: int) -> None:
     logger.info(f"Random seed set to {seed}")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Early stopping
-# ---------------------------------------------------------------------------
+# -
 class EarlyStopping:
     """Early stopping monitor.
 
@@ -128,9 +128,9 @@ class EarlyStopping:
         return self.should_stop
 
 
-# ---------------------------------------------------------------------------
+# -
 # Training epoch
-# ---------------------------------------------------------------------------
+# -
 def train_one_epoch(
     model: nn.Module,
     dataloader: DataLoader,
@@ -194,9 +194,9 @@ def train_one_epoch(
     return {"loss": epoch_loss, "accuracy": epoch_acc}
 
 
-# ---------------------------------------------------------------------------
+# -
 # Validation epoch
-# ---------------------------------------------------------------------------
+# -
 @torch.no_grad()
 def validate(
     model: nn.Module,
@@ -271,9 +271,9 @@ def validate(
     }
 
 
-# ---------------------------------------------------------------------------
+# -
 # Full training pipeline
-# ---------------------------------------------------------------------------
+# -
 def train_model(
     config: dict[str, Any],
     fold: Optional[int] = None,
@@ -398,9 +398,9 @@ def train_model(
     best_epoch = 0
     history: list[dict[str, Any]] = []
 
-    # -----------------------------------------------------------------------
+    # -
     # Stage 1: Frozen backbone
-    # -----------------------------------------------------------------------
+    # -
     stage1 = train_cfg.get("stage1", {})
     stage1_epochs = stage1.get("epochs", 30)
     stage1_lr = stage1.get("learning_rate", 1e-3)
@@ -460,7 +460,7 @@ def train_model(
                 "val_loss": val_metrics["loss"],
                 "config": config,
             }, checkpoint_path)
-            logger.info(f"  ★ New best model saved (AUC: {val_auc:.4f})")
+            logger.info(f"   New best model saved (AUC: {val_auc:.4f})")
 
         # Log
         log_writer.writerow([
@@ -480,9 +480,9 @@ def train_model(
             logger.info(f"Early stopping at epoch {epoch}")
             break
 
-    # -----------------------------------------------------------------------
+    # -
     # Stage 2: Fine-tune backbone
-    # -----------------------------------------------------------------------
+    # -
     stage2 = train_cfg.get("stage2", {})
     stage2_epochs = stage2.get("epochs", 50)
     stage2_lr = stage2.get("learning_rate", 1e-4)
@@ -560,7 +560,7 @@ def train_model(
                 "val_loss": val_metrics["loss"],
                 "config": config,
             }, checkpoint_path)
-            logger.info(f"  ★ New best model saved (AUC: {val_auc:.4f})")
+            logger.info(f"   New best model saved (AUC: {val_auc:.4f})")
 
         log_writer.writerow([
             stage1_epochs + epoch, 2, train_metrics["loss"],
@@ -607,9 +607,9 @@ def train_model(
     }
 
 
-# ---------------------------------------------------------------------------
+# -
 # Cross-validation runner
-# ---------------------------------------------------------------------------
+# -
 def run_cross_validation(
     config: dict[str, Any],
     task: str = "binary",
@@ -687,9 +687,9 @@ def run_cross_validation(
     return cv_summary
 
 
-# ---------------------------------------------------------------------------
+# -
 # Final model refit
-# ---------------------------------------------------------------------------
+# -
 def train_final_model(
     config: dict[str, Any],
     task: str = "binary",
@@ -710,7 +710,7 @@ def train_final_model(
     logger.info("=" * 60)
     logger.info("FINAL MODEL TRAINING")
     logger.info("Training on full official training set (413 images)")
-    logger.info("Pipeline is LOCKED — no more model selection decisions")
+    logger.info("Pipeline is LOCKED - no more model selection decisions")
     logger.info("=" * 60)
 
     project_root = Path(config.get("_project_root", "."))
@@ -729,9 +729,9 @@ def train_final_model(
     return result
 
 
-# ---------------------------------------------------------------------------
+# -
 # CLI entry point
-# ---------------------------------------------------------------------------
+# -
 def main() -> None:
     """CLI entry point for training."""
     logging.basicConfig(
@@ -740,7 +740,7 @@ def main() -> None:
     )
 
     parser = argparse.ArgumentParser(
-        description="RetinaGuard AI — Model Training"
+        description="RetinaGuard AI - Model Training"
     )
     parser.add_argument("--config", type=Path, default=Path("configs/base_config.yaml"))
     parser.add_argument("--task", choices=["binary", "multiclass"], default="binary")

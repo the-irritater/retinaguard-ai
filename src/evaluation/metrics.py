@@ -1,6 +1,6 @@
 """
-RetinaGuard AI — Evaluation Metrics
-=====================================
+RetinaGuard AI - Evaluation Metrics
+-
 Purpose: Comprehensive metrics for binary and multiclass DR classification.
 
 Binary metrics (DR grade ≥ 2 detection):
@@ -43,9 +43,9 @@ from sklearn.metrics import (
 logger = logging.getLogger("retinaguard.metrics")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Threshold selection (validation set only)
-# ---------------------------------------------------------------------------
+# -
 def select_threshold_youden(
     y_true: np.ndarray,
     y_prob: np.ndarray,
@@ -142,9 +142,9 @@ def select_threshold(
         raise ValueError(f"Unknown threshold method: {method}")
 
 
-# ---------------------------------------------------------------------------
+# -
 # Binary metrics
-# ---------------------------------------------------------------------------
+# -
 def compute_binary_metrics(
     y_true: np.ndarray,
     y_prob: np.ndarray,
@@ -205,9 +205,9 @@ def compute_binary_metrics(
     return metrics
 
 
-# ---------------------------------------------------------------------------
+# -
 # Multiclass metrics
-# ---------------------------------------------------------------------------
+# -
 def compute_multiclass_metrics(
     y_true: np.ndarray,
     y_pred: np.ndarray,
@@ -277,9 +277,9 @@ def compute_multiclass_metrics(
     return metrics
 
 
-# ---------------------------------------------------------------------------
+# -
 # ROC and PR curve data
-# ---------------------------------------------------------------------------
+# -
 def compute_roc_curve(
     y_true: np.ndarray,
     y_prob: np.ndarray,
