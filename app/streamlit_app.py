@@ -14,23 +14,38 @@ Usage:
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
-from typing import Optional
 
-import cv2
-import numpy as np
+# Ensure project root is on sys.path so src.* imports work on Streamlit Cloud
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 import streamlit as st
-import torch
-import json
-import yaml
 
-# Configure page
+# Configure page — must come before any other st.* calls
 st.set_page_config(
     page_title="RetinaGuard AI - DR Screening Research Demo",
     page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Heavy imports with defensive error handling for Streamlit Cloud
+try:
+    import cv2
+    import numpy as np
+    import torch
+    import json
+    import yaml
+except ImportError as e:
+    st.error(
+        f"**Dependency import failed:** `{e}`\n\n"
+        "This usually means a package is missing or incompatible on Streamlit Cloud. "
+        "Check `requirements.txt` and the deployment logs."
+    )
+    st.stop()
 
 logger = logging.getLogger("retinaguard.app")
 
@@ -87,9 +102,6 @@ The following severity grades are provided for general education. This applicati
 @st.cache_resource
 def load_model(config_path: str, checkpoint_path: str):
     """Load model and config from disk (cached across sessions)."""
-    import sys
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    
     from src.models.architectures import create_model
     
     with open(config_path) as f:
@@ -211,9 +223,6 @@ def assess_image_suitability(image_rgb: np.ndarray) -> tuple[str, list[str]]:
 
 def preprocess_for_inference(image_rgb: np.ndarray, config: dict) -> torch.Tensor:
     """Preprocess an uploaded image for model inference."""
-    import sys
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    
     from src.data.preprocessing import preprocess_image, get_transforms
     
     image_size = config["preprocessing"]["image_size"]
@@ -226,9 +235,6 @@ def preprocess_for_inference(image_rgb: np.ndarray, config: dict) -> torch.Tenso
 
 def generate_gradcam(model, image_tensor, device):
     """Generate Grad-CAM overlay for the given image."""
-    import sys
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    
     from src.explainability.gradcam import GradCAMExplainer
     
     explainer = GradCAMExplainer(model, use_cuda=torch.cuda.is_available())
@@ -251,7 +257,7 @@ def main():
         st.divider()
         
         # Config paths
-        project_root = Path(__file__).resolve().parent.parent
+        project_root = _PROJECT_ROOT
         config_path = st.text_input(
             "Config Path",
             value=str(project_root / "configs" / "base_config.yaml"),
